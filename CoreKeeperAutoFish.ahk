@@ -4,7 +4,7 @@
 ;  Last Updated: 2022/04/12
 ;  Author: Tim Martin
 ; -------------------------------------------------------------------------------- ;
-#Include Lib\VA.ahk
+#Include VA.ahk
 
 
 audioMeter := VA_GetAudioMeter()
