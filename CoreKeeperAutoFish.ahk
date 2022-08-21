@@ -4,11 +4,15 @@
 ;  Last Updated: 2022/04/12
 ;  Author: Tim Martin
 ; -------------------------------------------------------------------------------- ;
+#Include Lib\VA.ahk
 
+
+audioMeter := VA_GetAudioMeter()
 toggle := 0
+autofish := 1
 baitSkill := -1
 isOpen := 0
-delay := 12400
+delay := 18400
 time := A_TickCount
 
 MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can afk fish while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT.`n`nEnsure you are holding a fishing rod (it is advised to have at least 5 other fishing rods in your inventory).`n`nThen press Ctrl + Shift + f and input your ""Improved Bait"" skill level to automatically fish.`n`nYou can press Ctrl + Shift + f to stop automatically fishing at any time."
@@ -20,12 +24,6 @@ If isOpen
 Loop {
     stage := 0
     While toggle {
-        If (isOpen and handleSubmit) {
-            Gui, Submit
-            delay := Floor(12400 * (1 - (baitSkill * 0.05)))
-            handleSubmit := 0
-            isOpen := 0
-        }
 
         If WinExist("Core Keeper") {
             If WinActive("Core Keeper") {
@@ -37,18 +35,6 @@ Loop {
                 Mx := WinW * 0.8
                 My := WinH / 2
 
-                While (baitSkill < 0 and !isOpen) {
-                    Gui, New
-                    Gui, Add, Text,, Select your "Improved Bait" skill level.
-                    Gui, Add, Edit
-                    Gui, Add, UpDown, vbaitSkill Range0-5, 0
-                    Gui, Add, Button, Default gOK, OK
-                    Gui, Show
-                    isOpen := 1
-                }
-
-                While isOpen
-                    continue
 
                 pixelFound := 0
                 PixelSearch, Px1, Py1, Rx1, Ry1, Rx2, Ry2, 0xB94D0D, 3, Fast
@@ -60,36 +46,60 @@ Loop {
 
                 If !pixelFound {
                     if (stage == 0) {
-                        MouseClick, left, Mx, My,,0,D
-                        MouseClick, left, Mx, My,,0,U
+						if autofish {
+							Sleep 500
+							MouseClick, left, Mx, My,,0,D
+							Sleep 100
+							MouseClick, left, Mx, My,,0,U
+							Sleep 100
+						}
                         stage := 1
                         time := A_TickCount
                     }
                     
                     if (stage == 1 and A_TickCount > time + 100) {
-                        MouseClick, right, Mx, My,,0,D
+                        if autofish {
+							MouseClick, right, Mx, My,,0,D
+						}
                         stage := 2
                         time := A_TickCount
                     }
 
                     if (stage == 2 and A_TickCount > time + 200) {
-                        MouseClick, right, Mx, My,,0,U
+                        if autofish {
+							MouseClick, right, Mx, My,,0,U
+						}
                         stage := 3
                         time := A_TickCount
                     }
-
+					if (stage == 3 and A_TickCount > time + 2500) {
+						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
+						if peakValue > 0.091
+							{
+								MouseClick, right, Mx, My,,0,D
+								Sleep 100
+								MouseClick, right, Mx, My,,0,U
+								Sleep 200
+								stage := 4
+								time := A_TickCount
+							}
+                    }
                     if (stage == 3 and A_TickCount > time + delay) {
-                        MouseClick, right, Mx, My,,0,D
+                        if autofish {
+							MouseClick, right, Mx, My,,0,D
+						}
                         stage := 4
                         time := A_TickCount
                     }
 
                     if (stage == 4 and A_TickCount > time + 100) {
-                        MouseClick, right, Mx, My,,0,U
+                        if autofish {
+							MouseClick, right, Mx, My,,0,U
+						}
                         stage := 5
                         time := A_TickCount
                     }
-
+					
                     if (stage == 5 and A_TickCount > time + 500) {
                         stage := 0
                     }
@@ -130,3 +140,4 @@ Loop {
 return
 
 $^+f::toggle := !toggle
+$^+g::autofish := !autofish
