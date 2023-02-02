@@ -15,7 +15,7 @@ delay := 18400
 time := A_TickCount
 catchFish := 0
 
-MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f. You can press Ctrl + Shift + f to stop automatically fishing at any time. There is also a melee/ranged attack leveling mode that can be used by pressing Ctrl + Shift + g."
+MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f. You can press Ctrl + Shift + f to stop automatically fishing at any time. There is also a melee/ranged attack leveling mode that can be used by pressing Ctrl + Shift + h."
 
 Loop {
     stage := 0
