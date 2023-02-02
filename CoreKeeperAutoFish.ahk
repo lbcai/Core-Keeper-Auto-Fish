@@ -1,25 +1,20 @@
-; -------------------------------------------------------------------------------- ;
+﻿; -------------------------------------------------------------------------------- ;
 ;  Core Keeper Auto Fish AutoHotKey script
-;  Version: 0.0.3
-;  Last Updated: 2022/04/12
+;  Version: 0.0.6
+;  Last Updated: 2023/02/01
 ;  Author: Tim Martin
+;  Editor: lbcai, kildaremc
 ; -------------------------------------------------------------------------------- ;
 #Include VA.ahk
 
 
 audioMeter := VA_GetAudioMeter()
 toggle := 0
-autofish := 1
-baitSkill := -1
-isOpen := 0
 delay := 18400
 time := A_TickCount
+catchFish := 0
 
-MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can afk fish while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT.`n`nEnsure you are holding a fishing rod (it is advised to have at least 5 other fishing rods in your inventory).`n`nThen press Ctrl + Shift + f and input your ""Improved Bait"" skill level to automatically fish.`n`nYou can press Ctrl + Shift + f to stop automatically fishing at any time."
-
-OK:
-If isOpen
-    handleSubmit := 1
+MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f.`n`nYou can press Ctrl + Shift + f to stop automatically fishing at any time."
 
 Loop {
     stage := 0
@@ -35,44 +30,34 @@ Loop {
                 Mx := WinW * 0.8
                 My := WinH / 2
 
+				if (stage == 0) {
+					OutputDebug, % "0"
+					MouseClick, left, Mx, My,,0,D
+					Sleep 100
+					MouseClick, left, Mx, My,,0,U
+					Sleep 100
+					stage := 1
+					time := A_TickCount
+				}
 
-                pixelFound := 0
-                PixelSearch, Px1, Py1, Rx1, Ry1, Rx2, Ry2, 0xB94D0D, 3, Fast
-                If !ErrorLevel
-                    pixelFound := 1
-                PixelSearch, Px1, Py1, Rx1, Ry1, Rx2, Ry2, 0xFFA700, 3, Fast
-                If !ErrorLevel
-                    pixelFound := 1
+				if (stage == 1 and A_TickCount > time + 100) {
+					OutputDebug, % "1"
+					MouseClick, right, Mx, My,,0,D
+					stage := 2
+					time := A_TickCount
+				}
 
-                If !pixelFound {
-                    if (stage == 0) {
-						if autofish {
-							Sleep 500
-							MouseClick, left, Mx, My,,0,D
-							Sleep 100
-							MouseClick, left, Mx, My,,0,U
-							Sleep 100
-						}
-                        stage := 1
-                        time := A_TickCount
-                    }
-                    
-                    if (stage == 1 and A_TickCount > time + 100) {
-                        if autofish {
-							MouseClick, right, Mx, My,,0,D
-						}
-                        stage := 2
-                        time := A_TickCount
-                    }
+				if (stage == 2 and A_TickCount > time + 200) {
+					OutputDebug, % "2"
+					MouseClick, right, Mx, My,,0,U
+					stage := 3
+					time := A_TickCount
+				}
 
-                    if (stage == 2 and A_TickCount > time + 200) {
-                        if autofish {
-							MouseClick, right, Mx, My,,0,U
-						}
-                        stage := 3
-                        time := A_TickCount
-                    }
-					if (stage == 3 and A_TickCount > time + 2500) {
+				if (stage == 3 and A_TickCount > time + 1000) {
+					OutputDebug, % "3"
+					if (stage == 3 and A_TickCount < time + delay) {
+						OutputDebug, % "listening"
 						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
 						if peakValue > 0.091
 							{
@@ -80,48 +65,97 @@ Loop {
 								Sleep 100
 								MouseClick, right, Mx, My,,0,U
 								Sleep 200
-								stage := 4
+								stage := 5
 								time := A_TickCount
 							}
-                    }
-                    if (stage == 3 and A_TickCount > time + delay) {
-                        if autofish {
+						}
+						if (stage == 3 and A_TickCount > time + delay) {
+							OutputDebug, % "timed out"
+							MouseClick, right, Mx, My,,0,D
+							stage := 4
+							time := A_TickCount
+						}
+				}
+
+
+				if (stage == 4 and A_TickCount > time + 100) {
+					OutputDebug, % "timed out 1"
+					MouseClick, right, Mx, My,,0,U
+					stage := 7
+					time := A_TickCount
+				}
+
+				if (stage == 5) {
+					OutputDebug, % "5"
+					if (A_TickCount < time + 800) {
+						OutputDebug, % "listening"
+						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
+						if (catchFish) {
 							MouseClick, right, Mx, My,,0,D
 						}
-                        stage := 4
-                        time := A_TickCount
-                    }
+					if peakValue > 0.091
+						{
+							stage := 6
+						}
+					}
 
-                    if (stage == 4 and A_TickCount > time + 100) {
-                        if autofish {
+					if (A_TickCount > time + 800) {
+						OutputDebug, % "timed out 2"
+						if (catchFish) {
 							MouseClick, right, Mx, My,,0,U
 						}
-                        stage := 5
-                        time := A_TickCount
-                    }
-					
-                    if (stage == 5 and A_TickCount > time + 500) {
-                        stage := 0
-                    }
+						stage := 7
+						time := A_TickCount
+					}
+				}
 
-                    continue
-                }
+				if (stage == 6) {
+					OutputDebug, % "6"
+					if (!catchFish) {
+						OutputDebug, % "cancel"
+						send {left down}
+						Sleep 100
+						send {left up}
+						Sleep 100
+						send {right down}
+						Sleep 100
+						send {right up}
+						Sleep 100
+						stage := 7
+						time := A_TickCount
+						}
+					if (catchFish) {
+						OutputDebug, % "fishing"
+						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
+						if (A_TickCount < time + 1500) {
+							if peakValue > 0.16
+								{
+									MouseClick, right, Mx, My,,0,U
+									time := A_TickCount
+								}
+							if peakValue < 0.11
+								{
+									MouseClick, right, Mx, My,,0,D
+								}
+						}
 
-                pixelFound := 0
-                PixelSearch, Px2, Py2, Rx1, Ry1, Rx2, Ry2, 0x161CB4, 3, Fast
-                If !ErrorLevel
-                    pixelFound := 1
-                PixelSearch, Px2, Py2, Rx1, Ry1, Rx2, Ry2, 0x2B2AFF, 3, Fast
-                If !ErrorLevel
-                    pixelFound := 1
+						if (A_TickCount > time + 1500)
+							{
+								OutputDebug, % "no sound for a while - fishing over"
+								MouseClick, right, Mx, My,,0,U
+								stage := 7
+								time := A_TickCount
+							}
+					}
+				}
 
-                If !pixelFound {
-                    MouseClick, right, Mx, My,,0,D
-                    continue
-                } else {
-                    MouseClick, right, Mx, My,,0,U
-                    continue
-                }
+				if (stage == 7 and A_TickCount > time + 200) {
+					OutputDebug, % "7"
+					stage := 0
+				}
+
+				continue
+
             } else {
                 MsgBox, 4, % "Core Keeper Auto Fish - Core Keeper not active", % "You cannot fish if Core Keeper is not the active window.`n`nWould you like to make Core Keeper the active window?"
                 IfMsgBox, Yes
@@ -131,7 +165,7 @@ Loop {
                 continue
             }
         } else {
-            MsgBox, 0, % "Core Keeper Auto Fish - Core Keeper not running", % "Core Keeper is not runing.`n`nPlease run Core Keeper before attempting to fish."
+            MsgBox, 0, % "Core Keeper Auto Fish - Core Keeper not running", % "Core Keeper is not running.`n`nPlease run Core Keeper before attempting to fish."
             toggle := 0
             continue
         }
@@ -140,4 +174,4 @@ Loop {
 return
 
 $^+f::toggle := !toggle
-$^+g::autofish := !autofish
+;$^+g::catchFish := !catchFish
