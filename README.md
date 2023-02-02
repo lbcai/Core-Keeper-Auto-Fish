@@ -12,5 +12,9 @@ As noted in [kildaremc's](https://github.com/kildaremc/Core-Keeper-Auto-Fish) in
 
 There is also a portion of the code that is designed to beat the fishing minigame so that afk players can actually catch fish, but it currently doesn't work 100% of the time and has been disabled for now.
 
+It is recommended that players build walls around themselves and keep the water to their right in order to prevent movement off the tile and avoid being attacked by mobs while afk.
+
+Last updated 2023/02/01. 
+
 ## Thanks to
 * [Fish icons created by Freepik - Flaticon](https://www.flaticon.com/free-icons/fish)
