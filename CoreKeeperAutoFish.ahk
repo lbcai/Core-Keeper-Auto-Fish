@@ -10,15 +10,16 @@
 
 audioMeter := VA_GetAudioMeter()
 toggle := 0
+toggleAtk := 0
 delay := 18400
 time := A_TickCount
 catchFish := 0
 
-MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f.`n`nYou can press Ctrl + Shift + f to stop automatically fishing at any time."
+MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f. You can press Ctrl + Shift + f to stop automatically fishing at any time. There is also a melee/ranged attack leveling mode that can be used by pressing Ctrl + Shift + g."
 
 Loop {
     stage := 0
-    While toggle {
+    While (toggle and !toggleAtk) {
 
         If WinExist("Core Keeper") {
             If WinActive("Core Keeper") {
@@ -170,8 +171,42 @@ Loop {
             continue
         }
     }
+
+	While (toggleAtk and !toggle) {
+		If WinExist("Core Keeper") {
+            If WinActive("Core Keeper") {
+
+				MouseClick, left,,,,0,D
+				Sleep 100
+				MouseClick, left,,,,0,U
+				Sleep 100
+				continue
+
+            } else {
+                MsgBox, 4, % "Core Keeper Auto Attack - Core Keeper not active", % "You cannot use the script if Core Keeper is not the active window.`n`nWould you like to make Core Keeper the active window?"
+                IfMsgBox, Yes
+                    WinActivate
+                else IfMsgBox, No
+                    toggle := 0
+                continue
+            }
+        } else {
+            MsgBox, 0, % "Core Keeper Auto Attack - Core Keeper not running", % "Core Keeper is not running.`n`nPlease run Core Keeper before attempting to use script."
+            toggle := 0
+            continue
+        }
+	}
 }
 return
 
-$^+f::toggle := !toggle
-;$^+g::catchFish := !catchFish
+$^+f::
+toggle := !toggle
+toggleAtk := 0
+return
+
+;$^+g:: catchFish := !catchFish
+
+$^+h::
+toggleAtk := !toggleAtk
+toggle := 0
+return
