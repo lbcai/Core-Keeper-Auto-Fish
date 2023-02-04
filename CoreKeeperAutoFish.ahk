@@ -114,10 +114,6 @@ Loop {
 					OutputDebug, % "6"
 					if (!catchFish) {
 						OutputDebug, % "cancel"
-						send {left down}
-						Sleep 100
-						send {left up}
-						Sleep 100
 						send {right down}
 						Sleep 100
 						send {right up}
