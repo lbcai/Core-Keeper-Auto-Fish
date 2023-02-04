@@ -14,8 +14,9 @@ toggleAtk := 0
 delay := 18400
 time := A_TickCount
 catchFish := 0
+peakVal := 0
 
-MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f. You can press Ctrl + Shift + f to stop automatically fishing at any time. There is also a melee/ranged attack leveling mode that can be used by pressing Ctrl + Shift + h."
+MsgBox, 0, % "Core Keeper Auto Fish", % "Welcome to Core Keeper Auto Fish`n`nThis program automatically fishes for you in the game Core Keeper so that you can grind fishing levels while away from your computer.`n`nTo use this program stand with a water block next to you, on your RIGHT. It is recommended to block yourself in with walls to avoid moving off the tile or being attacked by mobs.`n`nEnsure you are holding a fishing rod, then press Ctrl + Shift + f. You can press Ctrl + Shift + f to stop automatically fishing at any time. The script defaults to leveling mode, so press Ctrl + Shift + g to catch fish. Some fish cannot currently be caught by the script, such as Devil Worm in the Clay Caves.`n`nThere is also a melee/ranged attack leveling mode that can be used by pressing Ctrl + Shift + h."
 
 Loop {
     stage := 0
@@ -88,7 +89,7 @@ Loop {
 
 				if (stage == 5) {
 					OutputDebug, % "5"
-					if (A_TickCount < time + 800) {
+					if (A_TickCount < time + 1500) {
 						OutputDebug, % "listening"
 						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
 						if (catchFish) {
@@ -100,7 +101,7 @@ Loop {
 						}
 					}
 
-					if (A_TickCount > time + 800) {
+					if (A_TickCount > time + 1500) {
 						OutputDebug, % "timed out 2"
 						if (catchFish) {
 							MouseClick, right, Mx, My,,0,U
@@ -123,23 +124,36 @@ Loop {
 						}
 					if (catchFish) {
 						OutputDebug, % "fishing"
-						VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
+
 						if (A_TickCount < time + 1500) {
-							if peakValue > 0.16
+
+							VA_IAudioMeterInformation_GetPeakValue(audioMeter, peakValue)
+							OutputDebug, % peakValue
+							if peakVal < peakValue
+								{
+									peakVal := peakValue
+								}
+
+							if peakVal > 0.18
 								{
 									MouseClick, right, Mx, My,,0,U
 									time := A_TickCount
 								}
-							if peakValue < 0.11
+
+							if peakVal < 0.11
 								{
 									MouseClick, right, Mx, My,,0,D
+									peakVal := 0
 								}
+
+
 						}
 
 						if (A_TickCount > time + 1500)
 							{
 								OutputDebug, % "no sound for a while - fishing over"
 								MouseClick, right, Mx, My,,0,U
+								peakVal := 0
 								stage := 7
 								time := A_TickCount
 							}
@@ -200,7 +214,7 @@ toggle := !toggle
 toggleAtk := 0
 return
 
-;$^+g:: catchFish := !catchFish
+$^+g:: catchFish := !catchFish
 
 $^+h::
 toggleAtk := !toggleAtk
