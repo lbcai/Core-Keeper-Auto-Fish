@@ -25,10 +25,6 @@ Loop {
         If WinExist("Core Keeper") {
             If WinActive("Core Keeper") {
                 WinGetPos, WinX, WinY, WinW, WinH
-                Rx1 := (WinW / 2) - (0.1883 * WinH)
-                Ry1 := 0.7713 * WinH
-                Rx2 := (WinW / 2) + (0.186 * WinH)
-                Ry2 := 0.803 * WinH
                 Mx := WinW * 0.8
                 My := WinH / 2
 
@@ -173,11 +169,13 @@ Loop {
                     WinActivate
                 else IfMsgBox, No
                     toggle := 0
+					toggleAtk := 0
                 continue
             }
         } else {
             MsgBox, 0, % "Core Keeper Auto Fish - Core Keeper not running", % "Core Keeper is not running.`n`nPlease run Core Keeper before attempting to fish."
             toggle := 0
+			toggleAtk := 0
             continue
         }
     }
@@ -198,11 +196,13 @@ Loop {
                     WinActivate
                 else IfMsgBox, No
                     toggle := 0
+					toggleAtk := 0
                 continue
             }
         } else {
             MsgBox, 0, % "Core Keeper Auto Attack - Core Keeper not running", % "Core Keeper is not running.`n`nPlease run Core Keeper before attempting to use script."
             toggle := 0
+			toggleAtk := 0
             continue
         }
 	}
